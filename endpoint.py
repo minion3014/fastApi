@@ -13,13 +13,21 @@ keyword_file_mapping = [
 
 def read_json_data(file_path: str) -> List[Dict]:
     try:
-        mount_path = "./backup-data/"
-        full_path = os.path.join(mount_path, file_path)
+        data_dir = "./data"
+        full_path = os.path.join(data_dir, file_path)
+        if not os.path.exists(full_path):
+            raise FileNotFoundError(f"Không tìm thấy file: {full_path}")
         with open(full_path, "r", encoding="utf-8") as f:
             return json.load(f)
-    except Exception as e:
+    except FileNotFoundError as e:
+        print(f"Lỗi: {e}")
+        raise HTTPException(status_code=404, detail=f"Không tìm thấy file: {file_path}")
+    except json.JSONDecodeError as e:
         print(f"Lỗi khi đọc file JSON: {e}")
-        return []
+        raise HTTPException(status_code=500, detail=f"Lỗi khi đọc file JSON: {file_path}")
+    except Exception as e:
+        print(f"Lỗi không xác định: {e}")
+        raise HTTPException(status_code=500, detail="Đã xảy ra lỗi khi đọc file")
 
 def filter_data_by_keyword(data: List[Dict], keyword: str) -> List[Dict]:
     if not keyword:
