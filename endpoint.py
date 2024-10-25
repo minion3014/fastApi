@@ -2,7 +2,6 @@ import os
 from fastapi import FastAPI, HTTPException, Query
 import json
 from typing import List, Dict, Optional
-from logger import app_logger
 
 app = FastAPI()
 
@@ -14,21 +13,13 @@ keyword_file_mapping = [
 
 def read_json_data(file_path: str) -> List[Dict]:
     try:
-        data_dir = "./data"
-        full_path = os.path.join(data_dir, file_path)
-        if not os.path.exists(full_path):
-            raise FileNotFoundError(f"Không tìm thấy file: {full_path}")
+        mount_path = "/mnt/wecare/"
+        full_path = os.path.join(mount_path, file_path)
         with open(full_path, "r", encoding="utf-8") as f:
             return json.load(f)
-    except FileNotFoundError as e:
-        app_logger.error(f"Lỗi: {e}")
-        raise HTTPException(status_code=404, detail=f"Không tìm thấy file: {file_path}")
-    except json.JSONDecodeError as e:
-        app_logger.error(f"Lỗi khi đọc file JSON: {e}")
-        raise HTTPException(status_code=500, detail=f"Lỗi khi đọc file JSON: {file_path}")
     except Exception as e:
-        app_logger.error(f"Lỗi không xác định: {e}")
-        raise HTTPException(status_code=500, detail="Đã xảy ra lỗi khi đọc file")
+        print(f"Lỗi khi đọc file JSON: {e}")
+        return []
 
 def filter_data_by_keyword(data: List[Dict], keyword: str) -> List[Dict]:
     if not keyword:
