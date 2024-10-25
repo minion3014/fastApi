@@ -8,9 +8,10 @@ app = FastAPI()
 
 # Mảng chứa các cặp từ khóa và tên thư mục
 keyword_directory_mapping = [
-    {"keywords": ["sản phẩm", "hàng hóa", "hang_hoa", "products", "san_pham"], "directory": "products"},
-    {"keywords": ["khách hàng", "customer", "khach_hang"], "directory": "customers"},
-    {"keywords": ["đơn hàng", "order", "don_hang"], "directory": "orders"},
+    {"keywords": ["sản phẩm", "hàng hóa", "hang_hoa", "products", "san_pham","sanpham"], "directory": "products"},
+    {"keywords": ["khách hàng", "customer", "khach_hang","khachang"], "directory": "customers"},
+    {"keywords": ["Nhà cung cấp", "supplier","nha_cung_cap","nhacungcap"], "directory": "suppliers"},
+    {"keywords": ["đơn hàng", "order", "don_hang","donhang"], "directory": "orders"},
     # Thêm các cặp khác tại đây
 ]
 
