@@ -13,8 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Sao chép mã nguồn ứng dụng vào container
 COPY . .
 
-# Tạo thư mục cho mount point và đặt quyền
-RUN mkdir -p /home/devecommerce/backup-data && chown -R nobody:nogroup /home/devecommerce/backup-data
 
 # Mở cổng mà ứng dụng FastAPI sẽ chạy
 EXPOSE 5400
