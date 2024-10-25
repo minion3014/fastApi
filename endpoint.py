@@ -7,13 +7,13 @@ app = FastAPI()
 
 # Mảng chứa các cặp từ khóa và tên file
 keyword_file_mapping = [
-    {"keywords": ["sản phẩm", "hàng hóa"], "file": "test_data.json"},
+    {"keywords": ["sản phẩm", "hàng hóa","hang_hoa","products", "san_pham","customer_data","sale_order"], "file": "test_data.json"},
     # Thêm các cặp khác tại đây
 ]
 
 def read_json_data(file_path: str) -> List[Dict]:
     try:
-        mount_path = "/home/devecommerce/backup-data/"
+        mount_path = "./backup-data/"
         full_path = os.path.join(mount_path, file_path)
         with open(full_path, "r", encoding="utf-8") as f:
             return json.load(f)
