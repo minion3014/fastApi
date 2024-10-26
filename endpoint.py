@@ -6,25 +6,17 @@ from logs.logger import app_logger
 
 app = FastAPI()
 
-# Mảng chứa các cặp từ khóa và tên thư mục
-keyword_directory_mapping = [
-    {"keywords": ["sản phẩm", "hàng hóa", "hang_hoa", "products", "san_pham","sanpham"], "directory": "products"},
-    {"keywords": ["khách hàng", "customer", "khach_hang","khachang"], "directory": "customers"},
-    {"keywords": ["Nhà cung cấp", "supplier","nha_cung_cap","nhacungcap"], "directory": "suppliers"},
-    {"keywords": ["đơn hàng", "order", "don_hang","donhang"], "directory": "orders"},
-    # Thêm các cặp khác tại đây
-]
+# Sử dụng /data làm thư mục dữ liệu mặc định
+DATA_DIR = os.getenv("DATA_DIR", "/data")
 
-def read_json_files_in_directory(directory: str) -> List[Dict]:
-    data_dir = "./data"  # Thư mục gốc chứa dữ liệu
-    full_path = os.path.join(data_dir, directory)
-    if not os.path.exists(full_path):
-        raise FileNotFoundError(f"Không tìm thấy thư mục: {full_path}")
+def read_all_json_files() -> List[Dict]:
+    if not os.path.exists(DATA_DIR):
+        raise FileNotFoundError(f"Không tìm thấy thư mục: {DATA_DIR}")
     
     all_data = []
-    for filename in os.listdir(full_path):
+    for filename in os.listdir(DATA_DIR):
         if filename.endswith('.json'):
-            file_path = os.path.join(full_path, filename)
+            file_path = os.path.join(DATA_DIR, filename)
             try:
                 with open(file_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
@@ -38,13 +30,6 @@ def read_json_files_in_directory(directory: str) -> List[Dict]:
                 app_logger.error(f"Lỗi không xác định khi đọc file {file_path}: {e}")
     
     return all_data
-
-def get_directory_for_keyword(keyword: str) -> Optional[str]:
-    keyword = keyword.lower()
-    for mapping in keyword_directory_mapping:
-        if any(kw == keyword for kw in mapping["keywords"]):
-            return mapping["directory"]
-    return None
 
 def filter_data_by_keyword(data: List[Dict], keyword: str) -> List[Dict]:
     if not keyword:
@@ -60,15 +45,10 @@ def filter_data_by_keyword(data: List[Dict], keyword: str) -> List[Dict]:
                 break
     return filtered_data
 
-@app.get("/{file_keyword}")
-async def search_data(file_keyword: str, filter_keyword: Optional[str] = Query(None)):
-    directory = get_directory_for_keyword(file_keyword)
-    
-    if not directory:
-        raise HTTPException(status_code=404, detail=f"Không tìm thấy thư mục phù hợp cho từ khóa '{file_keyword}'")
-    
+@app.get("/search")
+async def search_data(filter_keyword: Optional[str] = Query(None)):
     try:
-        all_data = read_json_files_in_directory(directory)
+        all_data = read_all_json_files()
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
     
@@ -76,12 +56,11 @@ async def search_data(file_keyword: str, filter_keyword: Optional[str] = Query(N
     
     if filtered_data:
         return {
-            "file_keyword": file_keyword,
             "filter_keyword": filter_keyword,
-            "directory": directory,
             "results": filtered_data
         }
     else:
-        raise HTTPException(status_code=404, detail=f"Không tìm thấy dữ liệu trong thư mục {directory}")
+        raise HTTPException(status_code=404, detail="Không tìm thấy dữ liệu phù hợp")
 
-# Ví dụ sử dụng: /nhóm a?filter_keyword=sản phẩm x
+# GET /search để lấy tất cả dữ liệu
+# GET /search?filter_keyword=example để tìm kiếm dữ liệu
