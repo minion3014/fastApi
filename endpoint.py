@@ -7,7 +7,7 @@ from logs.logger import app_logger
 app = FastAPI()
 
 # Sử dụng /data làm thư mục dữ liệu mặc định
-DATA_DIR = os.getenv("DATA_DIR", "/data")
+DATA_DIR = os.getenv("DATA_DIR", "/data/")
 
 def read_all_json_files() -> List[Dict]:
     if not os.path.exists(DATA_DIR):
