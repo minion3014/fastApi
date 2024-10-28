@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat GPT Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            height: 100vh;
+            display: flex;
+        }
+
+        .chat-container {
+            width: 400px;  /* Đặt chiều rộng cố định */
+            margin-left: auto;  /* Đẩy container về bên phải */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            border-left: 1px solid #e0e0e0;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .user-message {
+            background-color: #f5f5f5;
+            margin-left: 20%;
+        }
+
+        .bot-message {
+            background-color: #f5f5f5;
+            margin-right: 20%;
+        }
+
+        .input-container {
+            padding: 15px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 8px 20px;
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #106ebe;
+        }
+
+        /* Thêm styles mới */
+        .main-container {
+            flex: 1;
+            padding: 20px 40px;
+            background-color: white;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .prompt-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .prompt-list li {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .related-docs {
+            margin-bottom: 20px;
+        }
+
+        .related-docs a {
+            display: block;
+            color: #666;
+            text-decoration: none;
+            margin-bottom: 10px;
+        }
+
+        .related-docs a:hover {
+            color: #0078d4;
+        }
+
+        /* Thêm styles cho sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #f8f8f8;
+            height: 100vh;
+            padding: 20px 0;
+            border-right: 1px solid #e0e0e0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-header img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .search-box {
+            margin: 0 20px 20px 20px;
+            padding-right: 5px; /* Thêm padding bên phải */
+        }
+
+        .search-box input {
+            width: calc(100% - 5px); /* Giảm chiều rộng để cách phải 5px */
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .menu-section {
+            margin-bottom: 30px;
+        }
+
+        .menu-section h3 {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            padding: 0 20px;
+            margin-bottom: 10px;
+        }
+
+        .menu-item {
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .menu-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .submenu-item {
+            padding: 8px 20px 8px 45px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            display: block;
+        }
+
+        .submenu-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .close-sidebar {
+            display: flex;
+            align-items: center;
+            padding: 8px 20px;
+            color: #666;
+            font-size: 12px;
+            border-top: 1px solid #e0e0e0;
+            margin-top: auto;
+        }
+
+        .material-icons {
+            font-size: 20px; /* Điều chỉnh kích thước icon */
+        }
+
+        .sidebar-header .material-icons {
+            font-size: 24px; /* Icon header lớn hơn */
+        }
+    </style>
+    <!-- Thêm link Material Icons vào phần head -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <span class="material-icons">apps</span>
+            <span>WECARE</span>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" placeholder="Search">
+        </div>
+
+        <div class="menu-items">
+            <a href="#" class="menu-item">
+                <span class="material-icons">smart_toy</span>
+                Notion AI
+            </a>
+            <a href="#" class="menu-item">
+                <span class="material-icons">home</span>
+                Home
+            </a>
+            <a href="#" class="menu-item">
+                <span class="material-icons">inbox</span>
+                Inbox99+
+            </a>
+        </div>
+
+        <div class="menu-section">
+            <h3>PHÒNG BAN</h3>
+            <a href="#" class="menu-item">
+                <span class="material-icons">shopping_cart</span>
+                Sales
+            </a>
+            <a href="#" class="submenu-item">Customer Service</a>
+            <a href="#" class="submenu-item">Lead Generation</a>
+            <a href="#" class="submenu-item">Contract Management</a>
+
+            <a href="#" class="menu-item">
+                <span class="material-icons">inventory</span>
+                Sourcing
+            </a>
+            <a href="#" class="submenu-item">Vendor Selection</a>
+            <a href="#" class="submenu-item">Price Negotiation</a>
+            <a href="#" class="submenu-item">Quality Control</a>
+
+            <a href="#" class="menu-item">
+                <span class="material-icons">warehouse</span>
+                Warehouse
+            </a>
+            <a href="#" class="submenu-item">Inventory Management</a>
+            <a href="#" class="submenu-item">Order Fulfillment</a>
+            <a href="#" class="submenu-item">Stock Rotation</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="header">
+            <h1>Tổng quan Quy trình</h1>
+            <p class="description">Đây là phần tóm tắt của quy trình...</p>
+        </div>
+
+        <div class="section">
+            <h2>Gợi ý Prompts & Chủ đề</h2>
+            <ul class="prompt-list">
+                <li>Prompt 1</li>
+                <li>Prompt 2</li>
+                <li>Prompt 3</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Tài liệu liên quan</h2>
+            <div class="related-docs">
+                <a href="#">Tài liệu 1</a>
+                <a href="#">Tài liệu 2</a>
+                <a href="#">Tài liệu 3</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot-message">
+                Xin chào! Tôi có thể giúp gì cho bạn?
+            </div>
+        </div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Nhập câu hỏi của bạn...">
+            <button onclick="sendMessage()">Gửi</button>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessage(message, 'user-message');
+                
+                try {
+                    const response = await fetch('https://wecare-openai.openai.azure.com/openai/deployments/wecare-gpt-4o/chat/completions?api-version=2024-08-01-preview', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'api-key': '73b90109804148e5b0f779a0fe57aaac'  // Thay bằng API key của Azure
+                        },
+                        body: JSON.stringify({
+                            messages: [{
+                                role: "user",
+                                content: message
+                            }],
+                            temperature: 0.7
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('API Error:', errorData);
+                        throw new Error(`API error: ${errorData.error?.message || 'Unknown error'}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log('API Response:', data); // Log để debug
+                    
+                    if (data.choices && data.choices[0]) {
+                        addMessage(data.choices[0].message.content, 'bot-message');
+                    } else {
+                        throw new Error('Invalid response format');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error details:', error);
+                    addMessage(`Lỗi: ${error.message}`, 'bot-message');
+                }
+                
+                input.value = '';
+            }
+        }
+
+        function addMessage(text, className) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${className}`;
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // Cho phép gửi tin nhắn bằng phím Enter
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
