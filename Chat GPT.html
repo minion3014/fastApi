@@ -1209,15 +1209,16 @@
             position: fixed;
             bottom: 90px;
             right: 20px;
-            width: 400px;
-            height: 600px;
-            display: none; /* Ẩn chat box ban đầu */
+            width: 1000px;  /* Tăng chiều rộng từ 400px lên 500px */
+            height: 700px; /* Tăng chiều cao từ 600px lên 700px */
+            display: none;
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.3s ease, transform 0.3s ease;
             z-index: 999;
-            border-radius: 12px;
+            border-radius: 16px; /* Tăng border radius để trông mềm mại hơn */
             overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Tăng shadow để nổi bật hơn */
         }
 
         .chat-container.active {
@@ -1241,6 +1242,35 @@
 
         .chat-bubble.new-message {
             animation: bounce 1s infinite;
+        }
+
+        /* Điều chỉnh kích thước tin nhắn */
+        .message {
+            margin-bottom: 20px;
+            max-width: 90%; /* Tăng độ rộng tối đa của tin nhắn từ 80% lên 90% */
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Điều chỉnh font size cho nội dung tin nhắn */
+        .message-content {
+            padding: 15px 25px; /* Tăng padding */
+            font-size: 1rem; /* Tăng kích thước chữ */
+            line-height: 1.6; /* Tăng line height để dễ đọc hơn */
+        }
+
+        /* Điều chỉnh input */
+        #user-input {
+            padding: 15px 50px 15px 20px; /* Tăng padding */
+            font-size: 1rem; /* Tăng kích thước chữ */
+        }
+
+        /* Điều chỉnh header */
+        .chat-header {
+            padding: 20px 25px; /* Tăng padding */
+        }
+
+        .chat-header h2 {
+            font-size: 1.2rem; /* Tăng kích thước chữ */
         }
     </style>
     <!-- Thêm link Material Icons vào phần head -->
@@ -1398,7 +1428,7 @@
                                 <span class="material-icons">local_shipping</span>
                                 <div>
                                     <h5>Shipping & Receiving</h5>
-                                    <p>Quản lý nhập xuất kho</p>
+                                    <p>Qu���n lý nhập xuất kho</p>
                                 </div>
                             </a>
                             <a href="#" class="popup-item">
@@ -1601,7 +1631,7 @@
 
         // Thêm event listener khi trang đã load
         document.addEventListener('DOMContentLoaded', function() {
-            // Lấy tất cả các menu items và submenu items
+            // Lấy tất cả các menu items v�� submenu items
             const menuItems = document.querySelectorAll('.menu-item, .submenu-item');
             
             menuItems.forEach(item => {
