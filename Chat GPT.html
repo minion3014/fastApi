@@ -28,23 +28,35 @@
             flex: 1;
             padding: 20px;
             overflow-y: auto;
+            background: #ffffff;
         }
 
         .message {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 14px;
+            margin-bottom: 20px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
         }
 
-        .user-message {
-            background-color: #f5f5f5;
-            margin-left: 20%;
+        .message.bot-message {
+            background: #ffffff;
+            color: #1a1a1a;
+            border-radius: 18px 18px 18px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 15px 20px;
+            position: relative;
+            border-left: 4px solid #2ecc71;
+            margin-right: auto;
         }
 
-        .bot-message {
-            background-color: #f5f5f5;
-            margin-right: 20%;
+        .message.user-message {
+            background: #ffffff;
+            color: #1a1a1a;
+            border-radius: 18px 18px 0 18px;
+            padding: 15px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            position: relative;
+            border-right: 4px solid #0084ff;
+            margin-left: auto;
         }
 
         .input-container {
@@ -201,6 +213,10 @@
             text-decoration: none;
             font-size: 14px;
             display: block;
+            max-height: 40px; /* Chiều cao mặc định của submenu */
+            opacity: 1;
+            transition: all 0.3s ease;
+            overflow: hidden;
         }
 
         .submenu-item:hover {
@@ -294,6 +310,776 @@
             max-width: 100%;
             height: auto;
         }
+
+        /* Animation cho menu items */
+        .menu-item, .submenu-item {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .menu-item:hover, .submenu-item:hover {
+            background-color: #f0f0f0;
+            padding-left: 25px;
+        }
+
+        /* Animation cho icon trong menu item */
+        .menu-item .material-icons {
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item:hover .material-icons {
+            transform: rotate(5deg);
+        }
+
+        /* Animation cho active state */
+        .menu-item.active, .submenu-item.active {
+            background-color: #e9ecef;
+            font-weight: bold;
+        }
+
+        /* Animation cho submenu items */
+        .submenu-item {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .submenu-item::after {
+            display: none;
+        }
+
+        /* Thêm styles cho popup menu */
+        .menu-group {
+            position: relative;
+        }
+
+        .popup-menu {
+            position: absolute;
+            left: 100%;
+            top: 0;
+            width: 300px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .menu-item {
+            position: relative;
+        }
+
+        .menu-item .arrow {
+            position: absolute;
+            right: 15px;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item:hover .arrow {
+            transform: rotate(90deg);
+        }
+
+        .menu-item:hover + .popup-menu,
+        .popup-menu:hover {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .popup-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .popup-header h4 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .popup-content {
+            padding: 10px;
+        }
+
+        .popup-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px;
+            text-decoration: none;
+            color: #333;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            gap: 12px;
+        }
+
+        .popup-item:hover {
+            background-color: #f5f5f5;
+            transform: translateX(5px);
+        }
+
+        .popup-item .material-icons {
+            color: #666;
+            font-size: 20px;
+        }
+
+        .popup-item h5 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+        }
+
+        .popup-item p {
+            margin: 0;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Animation cho popup */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .popup-menu.active {
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        /* Hiệu ứng hover cho menu item */
+        .menu-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Style cho arrow icon */
+        .arrow {
+            opacity: 0.5;
+        }
+
+        .menu-item:hover .arrow {
+            opacity: 1;
+        }
+
+        /* Style cho trạng thái active của menu item */
+        .menu-item.active {
+            background-color: #f0f0f0;
+        }
+
+        /* Animation cho arrow khi active */
+        .menu-item.active .arrow {
+            transform: rotate(90deg);
+        }
+
+        /* Style cho chat container */
+        .chat-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Header của chat */
+        .chat-header {
+            background: #fff;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eaeaea;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-header h2 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        /* Khu vực tin nhắn */
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        /* Style cho từng tin nhắn */
+        .message {
+            margin-bottom: 20px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.user {
+            margin-left: auto;
+        }
+
+        .message-content {
+            padding: 12px 16px;
+            border-radius: 15px;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        /* Style cho tin nhắn của AI */
+        .message.ai .message-content {
+            background: #ffffff;
+            color: #1a1a1a;
+            border-radius: 18px 18px 18px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 15px 20px;
+            position: relative;
+            border-left: 4px solid #2ecc71;
+        }
+
+        /* Style cho tin nhắn của user */
+        .message.user .message-content {
+            background: #ffffff;
+            color: #1a1a1a;
+            border-radius: 18px 18px 0 18px;
+            padding: 15px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            position: relative;
+            border-right: 4px solid #0084ff;
+        }
+
+        /* Avatar và thông tin người gửi */
+        .message-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .sender-name {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Khu vực nhập tin nhắn */
+        .chat-input {
+            padding: 15px 20px;
+            background: #fff;
+            border-top: 1px solid #eaeaea;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            outline: none;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .message-input:focus {
+            border-color: #0084ff;
+        }
+
+        .send-button {
+            background: #0084ff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .send-button:hover {
+            transform: scale(1.05);
+        }
+
+        /* Animation cho tin nhắn mới */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Style cho code blocks trong tin nhắn */
+        .message pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .message code {
+            font-family: 'Fira Code', monospace;
+            color: #1a1a1a;
+        }
+
+        /* Thanh cuộn tùy chỉnh */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Hiệu ứng đang gõ */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 8px 12px;
+            background: #f0f0f0;
+            border-radius: 12px;
+            width: fit-content;
+            margin-bottom: 20px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #666;
+            border-radius: 50%;
+            animation: typingAnimation 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-4px);
+            }
+        }
+
+        /* Style cho khu vực tin nhắn */
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f0f2f5;  /* Màu nền nhẹ nhàng hơn */
+        }
+
+        /* Style chung cho tin nhắn */
+        .message {
+            margin-bottom: 24px;
+            max-width: 85%;
+            animation: fadeIn 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Style cho tin nhắn của AI */
+        .message.ai {
+            margin-right: auto;
+        }
+
+        .message.ai .message-content {
+            background: #ffffff;
+            color: #1a1a1a;
+            border-radius: 18px 18px 18px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 15px 20px;
+            position: relative;
+            border-left: 4px solid #2ecc71;  /* Viền xanh lá bên trái */
+        }
+
+        /* Style cho tin nhắn của user */
+        .message.user {
+            margin-left: auto;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #0084ff, #0099ff);
+            color: white;
+            border-radius: 18px 18px 0 18px;
+            padding: 15px 20px;
+            box-shadow: 0 2px 8px rgba(0, 84, 255, 0.15);
+            position: relative;
+        }
+
+        /* Thông tin người gửi */
+        .message-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .avatar.ai {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar.user {
+            background: linear-gradient(135deg, #0084ff, #0099ff);
+        }
+
+        .avatar img {
+            width: 24px;
+            height: 24px;
+            object-fit: cover;
+        }
+
+        .sender-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #666;
+        }
+
+        /* Style cho code blocks trong tin nhắn */
+        .message pre {
+            background: #1e1e1e;
+            color: #e6e6e6;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2);
+            border: 1px solid #333;
+        }
+
+        .message code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Hiệu ứng hover cho tin nhắn */
+        .message .message-content {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .message .message-content:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Animation cho tin nhắn mới */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Style cho timestamp */
+        .message-timestamp {
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 4px;
+            align-self: flex-end;
+        }
+
+        /* Style cho tin nhắn có hình ảnh */
+        .message-content img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 5px 0;
+        }
+
+        /* Style cho tin nhắn có link */
+        .message-content a {
+            color: #0084ff;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .message-content a:hover {
+            text-decoration: underline;
+        }
+
+        /* Style cho tin nhắn được highlight */
+        .message.highlighted .message-content {
+            animation: highlight 2s ease;
+        }
+
+        @keyframes highlight {
+            0% {
+                background-color: rgba(255, 255, 0, 0.2);
+            }
+            100% {
+                background-color: initial;
+            }
+        }
+
+        /* Style cho emoji trong tin nhắn */
+        .message-content .emoji {
+            font-size: 1.2em;
+            vertical-align: middle;
+        }
+
+        /* Style cho tin nhắn dài */
+        .message-content.long-message {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Thanh cuộn tùy chỉnh cho tin nhắn dài */
+        .message-content.long-message::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .message-content.long-message::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 2px;
+        }
+
+        /* Style cho Markdown trong tin nhắn */
+        .message-content {
+            /* Style cơ bản giữ nguyên */
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Headings */
+        .message-content h1,
+        .message-content h2,
+        .message-content h3,
+        .message-content h4 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            line-height: 1.3;
+            color: #2c3e50;
+        }
+
+        .message-content h1 { font-size: 1.8em; }
+        .message-content h2 { font-size: 1.5em; }
+        .message-content h3 { font-size: 1.3em; }
+        .message-content h4 { font-size: 1.1em; }
+
+        /* Links */
+        .message-content a {
+            color: #0366d6;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .message-content a:hover {
+            text-decoration: underline;
+        }
+
+        /* Code blocks */
+        .message-content pre {
+            background: #1e1e1e;
+            color: #e6e6e6;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+
+        /* Nút copy code */
+        .message-content pre::before {
+            content: 'Copy';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            font-size: 12px;
+            color: #999;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .message-content pre:hover::before {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Inline code */
+        .message-content code:not(pre code) {
+            background: rgba(27, 31, 35, 0.05);
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        /* Lists */
+        .message-content ul,
+        .message-content ol {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        .message-content li {
+            margin: 5px 0;
+        }
+
+        /* Blockquotes */
+        .message-content blockquote {
+            border-left: 4px solid #dfe2e5;
+            color: #6a737d;
+            padding: 0 15px;
+            margin: 15px 0;
+        }
+
+        /* Tables */
+        .message-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .message-content th,
+        .message-content td {
+            border: 1px solid #dfe2e5;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .message-content th {
+            background: #f6f8fa;
+        }
+
+        /* Images */
+        .message-content img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Horizontal rule */
+        .message-content hr {
+            border: none;
+            border-top: 2px solid #dfe2e5;
+            margin: 20px 0;
+        }
+
+        /* Syntax highlighting cho code */
+        .message-content .hljs-keyword { color: #ff79c6; }
+        .message-content .hljs-string { color: #f1fa8c; }
+        .message-content .hljs-comment { color: #6272a4; }
+        .message-content .hljs-function { color: #50fa7b; }
+        .message-content .hljs-number { color: #bd93f9; }
+        .message-content .hljs-operator { color: #ff79c6; }
+        .message-content .hljs-class { color: #8be9fd; }
+
+        /* Checkboxes trong task lists */
+        .message-content input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        /* Style cho keyboard shortcuts */
+        .message-content kbd {
+            background-color: #fafbfc;
+            border: 1px solid #d1d5da;
+            border-bottom-color: #c6cbd1;
+            border-radius: 3px;
+            box-shadow: inset 0 -1px 0 #c6cbd1;
+            color: #444d56;
+            display: inline-block;
+            font-size: 11px;
+            line-height: 10px;
+            padding: 3px 5px;
+            vertical-align: middle;
+        }
+
+        /* Style cho highlighted text */
+        .message-content mark {
+            background-color: #fff8c5;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+
+        /* Style cho footnotes */
+        .message-content .footnote {
+            font-size: 0.9em;
+            color: #6a737d;
+            vertical-align: super;
+        }
+
+        /* Style cho definition lists */
+        .message-content dl {
+            margin: 15px 0;
+        }
+
+        .message-content dt {
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .message-content dd {
+            margin-left: 20px;
+            color: #6a737d;
+        }
     </style>
     <!-- Thêm link Material Icons vào phần head -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -327,33 +1113,139 @@
                 <span class="material-icons">inbox</span>
                 Inbox99+
             </a>
-        </div>
 
-        <div class="menu-section">
-            <h3>PHÒNG BAN</h3>
-            <a href="#" class="menu-item">
-                <span class="material-icons">shopping_cart</span>
-                Sales
-            </a>
-            <a href="#" class="submenu-item">Customer Service</a>
-            <a href="#" class="submenu-item">Lead Generation</a>
-            <a href="#" class="submenu-item">Contract Management</a>
+            <!-- Thêm phần PHÒNG BAN -->
+            <div class="menu-section">
+                <h3>PHÒNG BAN</h3>
+                <!-- Sales Menu -->
+                <div class="menu-group">
+                    <a href="#" class="menu-item" data-popup="sales-popup">
+                        <span class="material-icons">shopping_cart</span>
+                        Sales
+                        <span class="material-icons arrow">chevron_right</span>
+                    </a>
+                    <!-- Submenu items -->
+                    <a href="#" class="submenu-item">Customer Service</a>
+                    <a href="#" class="submenu-item">Lead Generation</a>
+                    <a href="#" class="submenu-item">Contract Management</a>
+                    <!-- Popup menu -->
+                    <div class="popup-menu" id="sales-popup">
+                        <div class="popup-header">
+                            <span class="material-icons">shopping_cart</span>
+                            <h4>Sales Department</h4>
+                        </div>
+                        <div class="popup-content">
+                            <a href="#" class="popup-item">
+                                <span class="material-icons">support_agent</span>
+                                <div>
+                                    <h5>Customer Service</h5>
+                                    <p>Quản lý và hỗ trợ khách hàng</p>
+                                </div>
+                            </a>
+                            <a href="#" class="popup-item">
+                                <span class="material-icons">trending_up</span>
+                                <div>
+                                    <h5>Lead Generation</h5>
+                                    <p>Tìm kiếm khách hàng tiềm năng</p>
+                                </div>
+                            </a>
+                            <a href="#" class="popup-item">
+                                <span class="material-icons">description</span>
+                                <div>
+                                    <h5>Contract Management</h5>
+                                    <p>Quản lý hợp đồng</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
-            <a href="#" class="menu-item">
-                <span class="material-icons">inventory</span>
-                Sourcing
-            </a>
-            <a href="#" class="submenu-item">Vendor Selection</a>
-            <a href="#" class="submenu-item">Price Negotiation</a>
-            <a href="#" class="submenu-item">Quality Control</a>
+                <!-- Sourcing Menu -->
+                <div class="menu-group">
+                    <a href="#" class="menu-item" data-popup="sourcing-popup">
+                        <span class="material-icons">inventory</span>
+                        Sourcing
+                        <span class="material-icons arrow">chevron_right</span>
+                    </a>
+                    <!-- Submenu items -->
+                    <a href="#" class="submenu-item">Supplier Research</a>
+                    <a href="#" class="submenu-item">Supplier Relations</a>
+                    <a href="#" class="submenu-item">Purchase Orders</a>
+                    <!-- Popup menu -->
+                    <div class="popup-menu" id="sourcing-popup">
+                        <div class="popup-header">
+                            <span class="material-icons">inventory</span>
+                            <h4>Sourcing Department</h4>
+                        </div>
+                        <div class="popup-content">
+                            <a href="#" class="popup-item">
+                                <span class="material-icons">search</span>
+                                <div>
+                                    <h5>Supplier Research</h5>
+                                    <p>Tìm kiếm và đánh giá nhà cung cấp</p>
+                                </div>
+                            </a>
+                            <a href="#" class="popup-item">
+                                <span class="material-icons">handshake</span>
+                                <div>
+                                    <h5>Supplier Relations</h5>
+                                    <p>Quản lý quan hệ nhà cung cấp</p>
+                                </div>
+                            </a>
+                            <a href="#" class="popup-item">
+                                <span class="material-icons">assignment</span>
+                                <div>
+                                    <h5>Purchase Orders</h5>
+                                    <p>Quản lý đơn đặt hàng</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
-            <a href="#" class="menu-item">
-                <span class="material-icons">warehouse</span>
-                Warehouse
-            </a>
-            <a href="#" class="submenu-item">Inventory Management</a>
-            <a href="#" class="submenu-item">Order Fulfillment</a>
-            <a href="#" class="submenu-item">Stock Rotation</a>
+                <!-- Warehouse Menu -->
+                <div class="menu-group">
+                    <a href="#" class="menu-item" data-popup="warehouse-popup">
+                        <span class="material-icons">warehouse</span>
+                        Warehouse
+                        <span class="material-icons arrow">chevron_right</span>
+                    </a>
+                    <!-- Submenu items -->
+                    <a href="#" class="submenu-item">Inventory Control</a>
+                    <a href="#" class="submenu-item">Shipping & Receiving</a>
+                    <a href="#" class="submenu-item">Stock Management</a>
+                    <!-- Popup menu -->
+                    <div class="popup-menu" id="warehouse-popup">
+                        <div class="popup-header">
+                            <span class="material-icons">warehouse</span>
+                            <h4>Warehouse Management</h4>
+                        </div>
+                        <div class="popup-content">
+                            <a href="#" class="popup-item">
+                                <span class="material-icons">inventory_2</span>
+                                <div>
+                                    <h5>Inventory Control</h5>
+                                    <p>Quản lý hàng tồn kho</p>
+                                </div>
+                            </a>
+                            <a href="#" class="popup-item">
+                                <span class="material-icons">local_shipping</span>
+                                <div>
+                                    <h5>Shipping & Receiving</h5>
+                                    <p>Quản lý nhập xuất kho</p>
+                                </div>
+                            </a>
+                            <a href="#" class="popup-item">
+                                <span class="material-icons">qr_code_scanner</span>
+                                <div>
+                                    <h5>Stock Management</h5>
+                                    <p>Kiểm kê và theo dõi hàng hóa</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -552,6 +1444,87 @@
                     
                     // Refresh chatbox
                     refreshChatbox();
+                });
+            });
+        });
+
+        // Thêm JavaScript để xử lý popup
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuItems = document.querySelectorAll('.menu-item[data-popup]');
+            
+            menuItems.forEach(item => {
+                const popupId = item.getAttribute('data-popup');
+                const popup = document.getElementById(popupId);
+                
+                // Xử lý hover
+                item.addEventListener('mouseenter', () => {
+                    popup.classList.add('active');
+                });
+                
+                item.addEventListener('mouseleave', (e) => {
+                    // Kiểm tra xem chuột có đang ở trên popup không
+                    const rect = popup.getBoundingClientRect();
+                    const isMouseOverPopup = e.clientX >= rect.left && 
+                                           e.clientX <= rect.right &&
+                                           e.clientY >= rect.top && 
+                                           e.clientY <= rect.bottom;
+                    
+                    if (!isMouseOverPopup) {
+                        popup.classList.remove('active');
+                    }
+                });
+                
+                // Xử lý popup
+                popup.addEventListener('mouseleave', () => {
+                    popup.classList.remove('active');
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Xử lý click cho menu items chính
+            const menuItems = document.querySelectorAll('.menu-item[data-popup]');
+            
+            menuItems.forEach(item => {
+                // Lấy tất cả submenu items sau menu item này
+                const submenus = [];
+                let nextElement = item.nextElementSibling;
+                while (nextElement && nextElement.classList.contains('submenu-item')) {
+                    submenus.push(nextElement);
+                    nextElement = nextElement.nextElementSibling;
+                }
+
+                // Thêm event listener cho click
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Toggle active state cho menu item
+                    this.classList.toggle('active');
+                    
+                    // Toggle hiển thị cho submenu items
+                    submenus.forEach(submenu => {
+                        if (submenu.style.display === 'none') {
+                            submenu.style.display = 'block';
+                            // Animation mở ra
+                            submenu.style.maxHeight = submenu.scrollHeight + 'px';
+                            submenu.style.opacity = '1';
+                        } else {
+                            // Animation thu gọn
+                            submenu.style.maxHeight = '0';
+                            submenu.style.opacity = '0';
+                            setTimeout(() => {
+                                submenu.style.display = 'none';
+                            }, 300); // Đợi animation hoàn thành
+                        }
+                    });
+
+                    // Xoay mũi tên
+                    const arrow = this.querySelector('.arrow');
+                    if (arrow) {
+                        arrow.style.transform = this.classList.contains('active') 
+                            ? 'rotate(90deg)' 
+                            : 'rotate(0)';
+                    }
                 });
             });
         });
