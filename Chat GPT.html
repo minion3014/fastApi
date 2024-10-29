@@ -60,18 +60,22 @@
         }
 
         .input-container {
-            padding: 15px;
+            padding: 15px 20px;
             border-top: 1px solid #e0e0e0;
             display: flex;
-            gap: 10px;
+            gap: 12px;
+            align-items: center;
+            position: relative;
         }
 
         #user-input {
             flex: 1;
-            padding: 8px 12px;
+            padding: 12px 45px 12px 15px; /* Tăng padding bên phải cho nút gửi */
             border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            font-size: 14px;
+            border-radius: 24px;
+            outline: none;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
         }
 
         button {
@@ -1080,6 +1084,98 @@
             margin-left: 20px;
             color: #6a737d;
         }
+
+        /* Style cho container chứa input và buttons */
+        .input-container {
+            padding: 15px 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Style cho nút đính kèm bên trái */
+        .attach-button {
+            background: transparent;
+            border: none;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+            color: #666;
+            flex-shrink: 0;
+        }
+
+        .attach-button:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Style cho input */
+        #user-input {
+            flex: 1;
+            padding: 12px 45px 12px 15px; /* Tăng padding bên phải cho nút gửi */
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            outline: none;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
+        }
+
+        /* Style cho nút gửi */
+        .send-button {
+            position: absolute;
+            right: 30px;
+            background: transparent;
+            border: none;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+            color: #0084ff;
+        }
+
+        .send-button:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Ẩn input file mặc định */
+        #file-input {
+            display: none;
+        }
+
+        /* Style cho icon */
+        .material-icons {
+            font-size: 20px;
+        }
+
+        /* Style cho tin nhắn lỗi */
+        .message.error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        /* Style cho file đang xử lý */
+        .message.processing {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
     </style>
     <!-- Thêm link Material Icons vào phần head -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -1281,8 +1377,14 @@
             </div>
         </div>
         <div class="input-container">
+            <input type="file" id="file-input" multiple>
+            <button class="icon-button attach-button" onclick="document.getElementById('file-input').click()">
+                <span class="material-icons">attach_file</span>
+            </button>
             <input type="text" id="user-input" placeholder="Nhập câu hỏi của bạn...">
-            <button onclick="sendMessage()">Gửi</button>
+            <button class="icon-button send-button" onclick="sendMessage()">
+                <span class="material-icons">send</span>
+            </button>
         </div>
     </div>
 
@@ -1528,6 +1630,77 @@
                 });
             });
         });
+
+        // Thêm hàm xử lý file
+        document.getElementById('file-input').addEventListener('change', async function(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                for (let file of files) {
+                    try {
+                        const content = await readFileContent(file);
+                        // Thêm tin nhắn hiển thị tên file
+                        addMessage(`Đang đọc file: ${file.name}`, 'user-message');
+                        
+                        // Gửi nội dung file lên chat
+                        const message = `Đây là nội dung của file ${file.name}:\n\n${content}`;
+                        chatHistory.push({
+                            role: "user",
+                            content: message
+                        });
+
+                        try {
+                            const response = await fetch(config.OPENAI_API_ENDPOINT + '?api-version=2024-08-01-preview', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'api-key': config.OPENAI_API_KEY
+                                },
+                                body: JSON.stringify({
+                                    messages: chatHistory,
+                                    temperature: 0.7
+                                })
+                            });
+
+                            const data = await response.json();
+                            if (data.choices && data.choices[0] && data.choices[0].message) {
+                                const botResponse = data.choices[0].message.content;
+                                chatHistory.push({
+                                    role: "assistant",
+                                    content: botResponse
+                                });
+                                addMessage(botResponse, 'bot-message');
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            addMessage(`Đã xảy ra lỗi khi xử lý file: ${error.message}`, 'bot-message error');
+                        }
+                    } catch (error) {
+                        console.error('Error reading file:', error);
+                        addMessage(`Không thể đọc file ${file.name}: ${error.message}`, 'bot-message error');
+                    }
+                }
+            }
+            // Reset input file để có thể chọn lại file cũ
+            e.target.value = '';
+        });
+
+        // Hàm đọc nội dung file
+        function readFileContent(file) {
+            return new Promise((resolve, reject) => {
+                if (file.type.startsWith('text/') || file.type === 'application/json') {
+                    // Đọc file text
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = (e) => reject(new Error('Không thể đọc file'));
+                    reader.readAsText(file);
+                } else if (file.type.startsWith('image/')) {
+                    // Xử lý file ảnh
+                    reject(new Error('Tạm thời chưa hỗ trợ file ảnh'));
+                } else {
+                    reject(new Error('Loại file không được hỗ trợ'));
+                }
+            });
+        }
     </script>
 </body>
 </html>
