@@ -1176,6 +1176,72 @@
             border-radius: 4px;
             margin-bottom: 10px;
         }
+
+        /* Thêm style cho chat bubble */
+        .chat-bubble {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #0084ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .chat-bubble:hover {
+            transform: scale(1.1);
+        }
+
+        .chat-bubble .material-icons {
+            color: white;
+            font-size: 28px;
+        }
+
+        /* Chỉnh sửa style cho chat-container */
+        .chat-container {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 400px;
+            height: 600px;
+            display: none; /* Ẩn chat box ban đầu */
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 999;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .chat-container.active {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Animation cho chat bubble khi có tin nhắn mới */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .chat-bubble.new-message {
+            animation: bounce 1s infinite;
+        }
     </style>
     <!-- Thêm link Material Icons vào phần head -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -1186,6 +1252,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 </head>
 <body>
+    <div class="chat-bubble" onclick="toggleChat()">
+        <span class="material-icons">chat</span>
+    </div>
+
     <div class="sidebar">
         <div class="sidebar-header">
             <span class="material-icons">apps</span>
@@ -1701,6 +1771,65 @@
                 }
             });
         }
+
+        // Thêm function để toggle chat box
+        function toggleChat() {
+            const chatContainer = document.querySelector('.chat-container');
+            const chatBubble = document.querySelector('.chat-bubble');
+            
+            chatContainer.classList.toggle('active');
+            
+            // Thay đổi icon khi mở/đóng chat
+            const icon = chatBubble.querySelector('.material-icons');
+            if (chatContainer.classList.contains('active')) {
+                icon.textContent = 'close';
+                chatBubble.style.backgroundColor = '#dc3545';
+            } else {
+                icon.textContent = 'chat';
+                chatBubble.style.backgroundColor = '#0084ff';
+            }
+            
+            // Xóa animation new-message khi mở chat
+            chatBubble.classList.remove('new-message');
+        }
+
+        // Sửa lại hàm addMessage để thêm thông báo tin nhắn mới
+        function addMessage(text, className) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${className}`;
+            
+            if (className === 'bot-message') {
+                messageDiv.innerHTML = marked.parse(text);
+                messageDiv.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightBlock(block);
+                });
+                
+                // Thêm thông báo tin nhắn mới nếu chat box đang ẩn
+                const chatContainer = document.querySelector('.chat-container');
+                const chatBubble = document.querySelector('.chat-bubble');
+                if (!chatContainer.classList.contains('active')) {
+                    chatBubble.classList.add('new-message');
+                }
+            } else {
+                messageDiv.textContent = text;
+            }
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // Thêm sự kiện click bên ngoài để đóng chat box
+        document.addEventListener('click', function(event) {
+            const chatContainer = document.querySelector('.chat-container');
+            const chatBubble = document.querySelector('.chat-bubble');
+            
+            if (!chatContainer.contains(event.target) && 
+                !chatBubble.contains(event.target) && 
+                chatContainer.classList.contains('active')) {
+                toggleChat();
+            }
+        });
     </script>
 </body>
 </html>
