@@ -9,6 +9,63 @@ app = FastAPI()
 # Sử dụng /data làm thư mục dữ liệu mặc định và đảm bảo không có dấu / ở cuối
 DATA_DIR = os.path.normpath(os.getenv("DATA_DIR", "/data"))
 
+# Định nghĩa mapping giữa từ khóa và thư mục
+FOLDER_KEYWORDS = {
+    "sale": [
+        # Từ khóa về bán hàng cơ bản
+        "sale", "promotion", "customer", "donhang", "khachhang", "order", "khuyenmai", "discount",
+        # Từ khóa về giao dịch
+        "giaodich", "transaction", "hoadon", "invoice", "bill",
+        # Từ khóa về khách hàng
+        "daily", "doitac", "partner", "member", "thanhvien",
+        # Từ khóa về chương trình khuyến mãi
+        "voucher", "coupon", "giamgia", "tichdiem", "loyalty",
+        # Từ khóa về doanh số
+        "doanhso", "sales",
+        # Từ khóa về đơn hàng
+        "dathang", "purchase", "booking", "shipping", "vanchuyen"
+    ],
+    "product": [
+        # Từ khóa tiếng Việt cơ bản
+        "sanpham", "hanghoa", "mathang", 
+        # Từ khóa về đơn vị
+        "donvi", "unit", "quy_cach",
+        # Từ khóa về danh mục
+        "danhmuc", "nhomhang", "loaihang", "category",
+        # Từ khóa về thông tin sản phẩm
+        "product", "item", "goods", "commodity",
+        # Từ khóa về mã sản phẩm
+        "masanpham", "mahang", "sku", "barcode",
+        # Từ khóa về thương hiệu
+        "thuonghieu", "brand",
+        # Từ khóa về thông số kỹ thuật
+        "thongso", "specification"
+    ],
+    "kpi": [
+        # Từ khóa về KPI và doanh thu
+        "kpi", "doanhthu", "revenue", "target", "muctieu", "chitieu",
+        # Từ khóa về hiệu suất
+        "hieuqua", "performance", "productivity", "nangxuat",
+        # Từ khóa về chỉ số
+        "chiso", "metric", "benchmark", "indicator",
+        # Từ khóa về đánh giá
+        "danhgia", "evaluation", "assessment", "rating",
+        # Từ khóa về mục tiêu kinh doanh
+        "goal", "objective", "achievement", "thanhqua",
+        # Từ khóa về báo cáo hiệu suất
+        "baocao", "report", "dashboard", "bangdieukhien",
+        # Từ khóa về tăng trưởng
+        "growth", "tangtruong", "progress", "tiendo"
+    ],
+}
+
+def get_folder_from_keyword(keyword: str) -> Optional[str]:
+    keyword = keyword.lower()
+    for folder, keywords in FOLDER_KEYWORDS.items():
+        if keyword in keywords:
+            return folder
+    return None
+
 def read_all_json_files(subfolder: Optional[str] = None) -> List[Dict]:
     base_dir = DATA_DIR
     if subfolder:
@@ -32,7 +89,7 @@ def read_all_json_files(subfolder: Optional[str] = None) -> List[Dict]:
                 app_logger.error(f"Lỗi khi đọc file JSON {file_path}: {e}")
             except Exception as e:
                 app_logger.error(f"Lỗi không xác định khi đọc file {file_path}: {e}")
-    
+
     return all_data
 
 def filter_data_by_keyword(data: List[Dict], keyword: str) -> List[Dict]:
@@ -54,8 +111,16 @@ async def search_data(
     folder: str,
     filter: Optional[str] = Query(None, description="Từ khóa tìm kiếm trong dữ liệu")
 ):
+    # Tìm thư mục tương ứng từ từ khóa
+    actual_folder = get_folder_from_keyword(folder)
+    if not actual_folder:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Không tìm thấy thư mục phù hợp với từ khóa: {folder}"
+        )
+    
     try:
-        all_data = read_all_json_files(folder)
+        all_data = read_all_json_files(actual_folder)
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
     
@@ -63,7 +128,8 @@ async def search_data(
     
     if filtered_data:
         return {
-            "folder": folder,
+            "folder": actual_folder,
+            "original_keyword": folder,
             "filter": filter,
             "results": filtered_data
         }
