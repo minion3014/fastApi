@@ -9,14 +9,18 @@ app = FastAPI()
 # Sử dụng /data làm thư mục dữ liệu mặc định và đảm bảo không có dấu / ở cuối
 DATA_DIR = os.path.normpath(os.getenv("DATA_DIR", "/data"))
 
-def read_all_json_files() -> List[Dict]:
-    if not os.path.exists(DATA_DIR):
-        raise FileNotFoundError(f"Không tìm thấy thư mục: {DATA_DIR}")
+def read_all_json_files(subfolder: Optional[str] = None) -> List[Dict]:
+    base_dir = DATA_DIR
+    if subfolder:
+        base_dir = os.path.join(DATA_DIR, subfolder)
+    
+    if not os.path.exists(base_dir):
+        raise FileNotFoundError(f"Không tìm thấy thư mục: {base_dir}")
     
     all_data = []
-    for filename in os.listdir(DATA_DIR):
+    for filename in os.listdir(base_dir):
         if filename.endswith('.json'):
-            file_path = os.path.join(DATA_DIR, filename)
+            file_path = os.path.join(base_dir, filename)
             try:
                 with open(file_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
@@ -45,22 +49,26 @@ def filter_data_by_keyword(data: List[Dict], keyword: str) -> List[Dict]:
                 break
     return filtered_data
 
-@app.get("/search")
-async def search_data(filter_keyword: Optional[str] = Query(None)):
+@app.get("/api/{folder}")
+async def search_data(
+    folder: str,
+    filter: Optional[str] = Query(None, description="Từ khóa tìm kiếm trong dữ liệu")
+):
     try:
-        all_data = read_all_json_files()
+        all_data = read_all_json_files(folder)
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
     
-    filtered_data = filter_data_by_keyword(all_data, filter_keyword) if filter_keyword else all_data
+    filtered_data = filter_data_by_keyword(all_data, filter) if filter else all_data
     
     if filtered_data:
         return {
-            "filter_keyword": filter_keyword,
+            "folder": folder,
+            "filter": filter,
             "results": filtered_data
         }
     else:
         raise HTTPException(status_code=404, detail="Không tìm thấy dữ liệu phù hợp")
 
-# GET /search để lấy tất cả dữ liệu
-# GET /search?filter_keyword=example để tìm kiếm dữ liệu
+# GET /api/sale để đọc dữ liệu từ thư mục /data/sale
+# GET /api/sale?filter=example để tìm kiếm trong thư mục /data/sale
