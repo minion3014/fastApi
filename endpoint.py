@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException, Query
 import json
 from typing import List, Dict, Optional
 from logs.logger import app_logger
+import re
 
 app = FastAPI()
 
@@ -92,19 +93,70 @@ def read_all_json_files(subfolder: Optional[str] = None) -> List[Dict]:
 
     return all_data
 
+def normalize_string(text: str) -> str:
+    """
+    Chuẩn hóa chuỗi: loại bỏ khoảng trắng thừa và chuyển về chữ thường
+    """
+    if not isinstance(text, str):
+        text = str(text)
+    return ''.join(text.lower().split())
+
 def filter_data_by_keyword(data: List[Dict], keyword: str) -> List[Dict]:
     if not keyword:
         return data
+    
+    # Chuẩn hóa từ khóa tìm kiếm
+    normalized_keyword = normalize_string(keyword)
     filtered_data = []
+    
     for item in data:
         for key, value in item.items():
-            if isinstance(value, str) and keyword.lower() in value.lower():
+            # Chuẩn hóa giá trị để so sánh
+            normalized_value = normalize_string(value)
+            if normalized_keyword in normalized_value:
                 filtered_data.append(item)
                 break
-            if isinstance(value, (int, float)) and keyword.lower() in str(value).lower():
-                filtered_data.append(item)
-                break
+    
     return filtered_data
+
+def parse_query(question: str):
+    """
+    Phân tích câu hỏi tự nhiên thành các tham số tìm kiếm
+    """
+    question = question.lower()
+    params = {
+        "folder": None,
+        "filter": []
+    }
+    
+    # Xác định folder
+    if any(keyword in question for keyword in ["kpi", "chỉ tiêu", "doanh thu", "hiệu quả"]):
+        params["folder"] = "kpi"
+    
+    # Tìm thông tin về thời gian
+    time_patterns = {
+        "tháng": r"tháng\s+(\d{1,2})",
+        "quý": r"quý\s+(\d{1})",
+        "năm": r"năm\s+(\d{4})"
+    }
+    
+    for time_type, pattern in time_patterns.items():
+        match = re.search(pattern, question)
+        if match:
+            params["filter"].append(f"{time_type} {match.group(1)}")
+    
+    # Tìm tên người
+    # Giả sử tên người nằm sau từ "của", "cho", "về"
+    name_indicators = ["của", "cho", "về"]
+    for indicator in name_indicators:
+        if indicator in question:
+            parts = question.split(indicator)
+            if len(parts) > 1:
+                name = parts[1].strip()
+                params["filter"].append(name)
+                break
+    
+    return params
 
 @app.get("/api/{folder}")
 async def search_data(
